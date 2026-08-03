@@ -27,9 +27,14 @@ try {
   bail();
 }
 
+// Strip a UTF-8 BOM before parsing. Some shells (PowerShell 5.1 piping to a native
+// exe, most visibly) prepend one, and JSON.parse rejects it — which would make the
+// hook silently no-op instead of linting.
+const clean = raw.replace(/^﻿/, '').trim();
+
 let payload;
 try {
-  payload = JSON.parse(raw || '{}');
+  payload = JSON.parse(clean || '{}');
 } catch {
   bail();
 }
